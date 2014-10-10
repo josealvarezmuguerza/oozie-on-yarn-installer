@@ -34,11 +34,11 @@ tar xzvf oozie-$OOZIE_VERSION.tar.gz
 
 cd $BUILD_DIR
 
-##Hadoop 2 needs client 2.0.4-alpha + , default 2.0.2 will fail
+##Hadoop 2 needs client 2.3.0 + , default 2.0.2 will fail
 ##        This is required while Oozie supports a a pre 0.23 version of Hadoop which does not have
 ##        the hadoop-auth artifact. After Oozie phase-out pre 0.23 we can get rid of this property.
 OOZIE_HADOOP_DEFAULT_AUTH_VERSION=`xmllint --xpath "(//*[local-name()='hadoop.auth.version']/text())[1]" $BUILD_DIR/pom.xml`
-OOZIE_HADOOP_AUTH_VERSION=2.0.6-alpha
+OOZIE_HADOOP_AUTH_VERSION=2.3.0
 ##update hadoop-client in main pom.xml
 sed -i 's/<hadoop.auth.version>'"$OOZIE_HADOOP_DEFAULT_AUTH_VERSION"'<\/hadoop.auth.version>/<hadoop.auth.version>'"$OOZIE_HADOOP_AUTH_VERSION"'<\/hadoop.auth.version>/' $BUILD_DIR/pom.xml 
 ##update hadoop-client in hadoop 2/hadooplibs  pom.xml
@@ -82,10 +82,10 @@ $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
 # Put required libraries to HDFS
 #HDFS=`xmllint --xpath "//configuration/property[name='fs.defaultFS']/value/text()" $HADOOP_HOME/etc/hadoop/core-site.xml`
 hdfs dfs -mkdir -p /user/$HADOOP_USER
-hdfs dfs -put ${BUILD_DIR}/sharelib/target/oozie-sharelib-$OOZIE_VERSION/share /user/$HADOOP_USER
+hdfs dfs -put -f ${BUILD_DIR}/sharelib/target/oozie-sharelib-$OOZIE_VERSION/share /user/$HADOOP_USER
 
 
 # Run Oozie
-bin/oozied.sh run
-bin/oozie admin -oozie http://localhost:11000/oozie -status
+$OOZIE_HOME/bin/oozied.sh run
+$OOZIE_HOME/bin/oozie admin -oozie http://localhost:11000/oozie -status
 
