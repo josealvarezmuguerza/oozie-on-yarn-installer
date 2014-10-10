@@ -4,11 +4,11 @@
 # Prerequisites: Hadoop 2 up & running
 #                JDK 6+
 
-## download and extract Oozie 3.3.2 (4.0.0 doesn't build for me)
+## download and extract Oozie 3.3.2
 
 ##Define folders and oozie version
-
 ##customize these 5 values
+
 ##Oozie version you want to install
 OOZIE_VERSION=3.3.2
 ##Installed hadoop version 
@@ -34,6 +34,17 @@ tar xzvf oozie-$OOZIE_VERSION.tar.gz
 
 cd $BUILD_DIR
 
+##Hadoop 2 needs client 2.0.4-alpha + , default 2.0.2 will fail
+##        This is required while Oozie supports a a pre 0.23 version of Hadoop which does not have
+##        the hadoop-auth artifact. After Oozie phase-out pre 0.23 we can get rid of this property.
+OOZIE_HADOOP_DEFAULT_AUTH_VERSION=`xmllint --xpath "(//*[local-name()='hadoop.auth.version']/text())[1]" $BUILD_DIR/pom.xml`
+OOZIE_HADOOP_AUTH_VERSION=2.0.6-alpha
+##update hadoop-client in main pom.xml
+sed -i 's/<hadoop.auth.version>'"$OOZIE_HADOOP_DEFAULT_AUTH_VERSION"'<\/hadoop.auth.version>/<hadoop.auth.version>'"$OOZIE_HADOOP_AUTH_VERSION"'<\/hadoop.auth.version>/' $BUILD_DIR/pom.xml 
+##update hadoop-client in hadoop 2/hadooplibs  pom.xml
+sed -i 's/<version>'"$OOZIE_HADOOP_DEFAULT_AUTH_VERSION"'/<version>'"$OOZIE_HADOOP_AUTH_VERSION"'/' $BUILD_DIR/hadooplibs/hadoop-2/pom.xml 
+
+
 ##compiling
 mvn -DskipTests=true -P $MVN_PROFILE_HADOOP_VERSION clean package assembly:single    
 
@@ -54,8 +65,6 @@ mkdir $OOZIE_HOME/libext
 cd $OOZIE_HOME/libext
 wget http://extjs.com/deploy/ext-2.2.zip
 
-
-OOZIE_HADOOP_AUTH_VERSION=`xmllint --xpath "(//*[local-name()='hadoop.auth.version']/text())[1]" $BUILD_DIR/pom.xml`
 cp $BUILD_DIR/hadooplibs/$OOZIE_HADOOP_VERSION/target/hadooplibs/hadooplib-$OOZIE_HADOOP_AUTH_VERSION.oozie-$OOZIE_VERSION/* $OOZIE_HOME/libext
 
 ##Prepare and deploy oozie war
