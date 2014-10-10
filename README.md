@@ -1,4 +1,4 @@
-oozie-at-yarn-installer
+oozie-on-yarn-installer
 =======================
 
 single script for installing Oozie Workflow Scheduler in local based on Hadoop Yarn.
@@ -13,8 +13,8 @@ single script for installing Oozie Workflow Scheduler in local based on Hadoop Y
 ###HOW-TO
 
 ```java
-git clone git@github.com:josealvarezmuguerza/oozie-at-yarn-installer.git
-cd oozie-at-yarn-installer
+git clone git@github.com:josealvarezmuguerza/oozie-on-yarn-installer.git
+cd oozie-on-yarn-installer
 ```
 
 Open install-oozie.sh in your preferred editor and set the following parameters as desired:
